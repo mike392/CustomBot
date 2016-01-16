@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomBot", "CustomBot\CustomBot.csproj", "{09AAA6BE-E3DA-4C08-84BC-A69A487A567F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElliotOscillator", "..\..\Indicators\ElliotOscillator\ElliotOscillator\ElliotOscillator.csproj", "{8E9AF53F-46CD-4EB5-AD87-80896D4762EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample Alligator", "..\..\Indicators\Sample Alligator\Sample Alligator\Sample Alligator.csproj", "{A742145C-E2B2-4F7E-BCA1-BAD1429665D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laguerre_RSI", "..\..\Indicators\Laguerre_RSI\Laguerre_RSI\Laguerre_RSI.csproj", "{5E887C73-716D-4807-87F1-5862824B6F23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laguerre", "..\..\Indicators\Laguerre\Laguerre\Laguerre.csproj", "{ADA64F08-2563-4069-9A1D-7B8E93C46F96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09AAA6BE-E3DA-4C08-84BC-A69A487A567F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09AAA6BE-E3DA-4C08-84BC-A69A487A567F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09AAA6BE-E3DA-4C08-84BC-A69A487A567F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09AAA6BE-E3DA-4C08-84BC-A69A487A567F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E9AF53F-46CD-4EB5-AD87-80896D4762EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E9AF53F-46CD-4EB5-AD87-80896D4762EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E9AF53F-46CD-4EB5-AD87-80896D4762EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E9AF53F-46CD-4EB5-AD87-80896D4762EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A742145C-E2B2-4F7E-BCA1-BAD1429665D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A742145C-E2B2-4F7E-BCA1-BAD1429665D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A742145C-E2B2-4F7E-BCA1-BAD1429665D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A742145C-E2B2-4F7E-BCA1-BAD1429665D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E887C73-716D-4807-87F1-5862824B6F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E887C73-716D-4807-87F1-5862824B6F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E887C73-716D-4807-87F1-5862824B6F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E887C73-716D-4807-87F1-5862824B6F23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADA64F08-2563-4069-9A1D-7B8E93C46F96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADA64F08-2563-4069-9A1D-7B8E93C46F96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADA64F08-2563-4069-9A1D-7B8E93C46F96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADA64F08-2563-4069-9A1D-7B8E93C46F96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

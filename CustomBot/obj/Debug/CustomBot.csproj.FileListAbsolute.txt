@@ -1,0 +1,15 @@
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\CustomBot.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\CustomBot.pdb
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\cAlgo.API.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\cAlgo.API.xml
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\obj\Debug\CustomBot.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\obj\Debug\CustomBot.pdb
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\ElliotOscillator.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\Sample Alligator.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\obj\Debug\CustomBot.csprojResolveAssemblyReference.cache
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\Laguerre.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\Laguerre_RSI.dll
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\ElliotOscillator.pdb
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\Sample Alligator.pdb
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\Laguerre_RSI.pdb
+C:\Users\Mikhail_Barsukou@epam.com\Documents\cAlgo\Sources\Robots\CustomBot\CustomBot\bin\Debug\Laguerre.pdb
