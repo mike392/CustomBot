@@ -34,6 +34,9 @@ namespace cAlgo
         private int rounding_factor = 4;
         private string crossing_msg = "";
         private List<double> cci3_values;
+        private List<double> cci13_values;
+        private List<double> ema_values;
+        private List<double> sma_values;
         private bool cci13_is_above_100 = false;
         private bool cci13_is_below_minus100 = false;
         private string filter_flag = "";
@@ -77,7 +80,7 @@ namespace cAlgo
 
             cci_13 = Indicators.CommodityChannelIndex(MarketSeries, 13);
             cci_3 = Indicators.CommodityChannelIndex(MarketSeries, 3);
-            cci3_values = new List<double> 
+            double[] input = 
             {
                 (0.0),
                 (0.0),
@@ -85,6 +88,10 @@ namespace cAlgo
                 (0.0),
                 (0.0)
             };
+            cci3_values = new List<double>(input);
+            cci13_values = new List<double>(input);
+            sma_values = new List<double>(input);
+            ema_values = new List<double>(input);
         }
 
         protected override void OnBar()
@@ -140,19 +147,25 @@ namespace cAlgo
         {
             base.OnTick();
 
+            ListHandler(ema_values, ema.Result);
+            ListHandler(sma_values, sma.Result);
+            ListHandler(cci3_values, cci_3.Result);
+            ListHandler(cci13_values, cci_13.Result);
             //checking if ema crosses sma from above or from below
 
-            if (CrossedBelow(ema.Result, sma.Result))
+            if (ema_values[0] > sma_values[0] && ema_values[1] < sma_values[1] & ema_values[2] < sma_values[2] && ema_values[3] < sma_values[3] && ema_values[4] < sma_values[4])
             {
                 crossing_msg = "ema crossed sma from below";
                 //ema_lastvalues = ema.Result.LastValue + " " + ema.Result.Last(1) + " " + ema.Result.Last(2) + " " + ema.Result.Last(3);
                 //sma_lastvalues = sma.Result.LastValue + " " + sma.Result.Last(1) + " " + sma.Result.Last(2) + " " + sma.Result.Last(3);
                 crossing_index = CrossingEnum.EmaHasCrossedSmaFromBelow;
+                Print(crossing_msg);
             }
-            if (CrossedAbove(ema.Result, sma.Result))
+            if (ema_values[0] < sma_values[0] && ema_values[1] > sma_values[1] & ema_values[2] > sma_values[2] && ema_values[3] > sma_values[3] && ema_values[4] > sma_values[4])
             {
                 crossing_msg = "ema crossed sma from above";
                 crossing_index = CrossingEnum.EmaHasCrossedSmaFromAbove;
+                Print(crossing_msg);
             }
 
             //checking for CCI 13 to be above 100 or below -100
@@ -179,8 +192,7 @@ namespace cAlgo
             //}
 
             //checking whether CCI 3 has hit from -100 to 100 and vice versa
-            cci3_values.Insert(0, cci_3.Result.LastValue);
-            cci3_values.RemoveAt(cci3_values.Count - 1);
+
             //foreach (double value in cci3_values)
             //{
             //    Print(value + " #" + cci3_values.IndexOf(value));
@@ -201,6 +213,11 @@ namespace cAlgo
         protected override void OnStop()
         {
             // Put your deinitialization logic here
+        }
+        private void ListHandler(List<double> inputlist, DataSeries inputseries)
+        {
+            inputlist.Insert(0, inputseries.LastValue);
+            inputlist.RemoveAt(inputlist.Count - 1);
         }
         #region CrossedBelow
         private bool CrossedBelow(DataSeries crossing, DataSeries crossed)
