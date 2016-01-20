@@ -15,15 +15,38 @@ namespace cAlgo
         public double Parameter { get; set; }
         private int count = 1;
         private double deviation = 0;
-        
+
         private Laguerre_RSI lag1;
         private Laguerre_RSI lag2;
         private Laguerre laguerre;
         private AwesomeOscillator ao;
+        private SampleAlligator all;
+        private WellesWilderSmoothing wws;
+        private SimpleMovingAverage sma;
+        private ExponentialMovingAverage ema;
+        private CommodityChannelIndex cci_13, cci_3;
         private Dictionary<TimeFrame, int> dict;
+
         private int multiplier;
         private int bars_precision = 4;
         private double border_precision = 0.1;
+        private int tick_count = 0;
+        private int rounding_factor = 4;
+        private string crossing_msg = "";
+        private List<double> cci3_values;
+        private bool cci13_is_above_100 = false;
+        private bool cci13_is_below_minus100 = false;
+        private string filter_flag = "";
+        private string ema_lastvalues = "";
+        private string sma_lastvalues = "";
+
+        private enum CrossingEnum
+        {
+            None,
+            EmaHasCrossedSmaFromAbove,
+            EmaHasCrossedSmaFromBelow
+        }
+        private CrossingEnum crossing_index;
         private enum FallingRising
         {
             None,
@@ -48,136 +71,186 @@ namespace cAlgo
         {
             // Put your initialization logic here
             Print("Started");
-            //dict = new Dictionary<TimeFrame, int>();
-            //initDictionary();
-            //multiplier = dict[this.TimeFrame];
-            //ind = Indicators.GetIndicator<ElliotOscillator>(Source, FastPeriod, SlowPeriod);
-            ao = Indicators.AwesomeOscillator();
-            laguerre = Indicators.GetIndicator<Laguerre>();
+            crossing_index = CrossingEnum.None;
+            sma = Indicators.SimpleMovingAverage(Source, 100);
+            ema = Indicators.ExponentialMovingAverage(Source, 16);
 
-            lag1 = Indicators.GetIndicator<Laguerre_RSI>(FastGamma);
-            lag2 = Indicators.GetIndicator<Laguerre_RSI>(SlowGamma);
-
+            cci_13 = Indicators.CommodityChannelIndex(MarketSeries, 13);
+            cci_3 = Indicators.CommodityChannelIndex(MarketSeries, 3);
+            cci3_values = new List<double> 
+            {
+                (0.0),
+                (0.0),
+                (0.0),
+                (0.0),
+                (0.0)
+            };
         }
 
         protected override void OnBar()
         {
             // Put your core logic here
-            Print("Current 0.5 laguerre value " + lag1.laguerrersi.LastValue);
-            Print("Current 0.9 laguerre value " + lag2.laguerrersi.LastValue);
-            Print("Current laguerre value " + laguerre.Result.LastValue);
-            //if (IsDecreasing(ao, bars_precision) && ao.Result.LastValue > ao.Result.Last(1))
+            //Print("CCI 3 current value " + cci_3.Result.LastValue + " Previous value " + cci_3.Result.Last(1));
+
+            //if ((cci_3.Result.LastValue >= 100 && cci_3.Result.Last(2) <= -100) || (cci_3.Result.LastValue >= 100 && cci_3.Result.Last(1) <= -100))
             //{
-            //    if (ao.Result.IsRising() && dirInd == FallingRising.Falling)
+            //    Print("CCI 3 raised from -100 to 100");
+            //    Print("CCI values " + cci_3.Result.LastValue + " " + cci_3.Result.Last(1) + " " + cci_3.Result.Last(2));
+            //}
+            //if ((cci_3.Result.LastValue <= -100 && cci_3.Result.Last(2) >= 100) || (cci_3.Result.LastValue <= -100 && cci_3.Result.Last(1) >= 100))
+            //{
+            //    Print("CCI 3 dropped from 100 to -100");
+            //    Print("CCI values " + cci_3.Result.LastValue + " " + cci_3.Result.Last(1) + " " + cci_3.Result.Last(2));
+            //}
+
+            //ema sma crossing test
+            #region CrossingTest
+            //if (crossing_index == CrossingEnum.EmaHasCrossedSmaFromAbove && cci13_is_above_100 == true)
+            //{
+            //    Print("Should sell");
+            //}
+            //if (crossing_index == CrossingEnum.EmaHasCrossedSmaFromBelow && cci13_is_below_minus100 == true)
+            //{
+            //    Print("Should buy");
+            //}
+            #endregion
+            #region LevelCrossing
+            //if (crossing_cci13_msg != "")
+            //{
+            //    if (cci_filter_flag != "")
             //    {
-                   
-            //if (IsIncreasing(laguerre, bars_precision) && Math.Abs(laguerre.Result.LastValue - 0.15) < border_precision)
-            //        {
-            //            Print("Open buy position");
-            //             Print("Laguerre value = " + laguerre.Result.LastValue);
-            //            Print("Is laguerre increasing " + IsIncreasing(laguerre, bars_precision));
-
-            //            //Print("Is AO Rising " + ao.Result.IsRising());
-            //            //Print("Previous indicator is red " + (dirInd == FallingRising.Falling));
-            //            //Print("Increses Slow Lagguerre " + IsIncreasing(lag2, precision));
-            //            //Print("Value of fast Lagguerre = " + lag1.laguerrersi.LastValue);
-            //            //Print("Slow Laguerre values " + lag2.laguerrersi.Last(5) + " " + lag2.laguerrersi.Last(4) + " " + lag2.laguerrersi.Last(3) + " " + lag2.laguerrersi.Last(2) + " " + lag2.laguerrersi.Last(1) + " " + lag2.laguerrersi.LastValue);
-            //            //Print("Lag1 over bought value " + lag1.overbought);
-            //            //Print("Lag1 over sold value " + lag1.oversold);
-            //            //Print("Lag2 over bought value " + lag2.overbought);
-            //            //Print("Lag2 over sold value " + lag2.oversold);
-            //        }
-            //    }
-            //}
-
-            //if (IsIncreasing(ao, bars_precision) && ao.Result.LastValue < ao.Result.Last(1))
-            //{
-            //    if (ao.Result.IsFalling() && dirInd == FallingRising.Rising)
-            //    {
-                    //if (IsDecreasing(laguerre, bars_precision) && Math.Abs(laguerre.Result.LastValue - 0.75) < border_precision)
-                    //{
-                    //    Print("Open sell position");
-                    //    Print("Laguerre value = " + laguerre.Result.LastValue);
-                    //    Print("Is laguerre decreasing " + IsDecreasing(laguerre, bars_precision));
-
-                    //    //Print("Decreases Slow Lagguerre " + IsDecreasing(lag2, precision));
-                    //    //Print("Value of fast Lagguerre = " + lag1.laguerrersi.LastValue);
-                    //    //Print("Slow Laguerre values " + lag2.laguerrersi.Last(5) + " " + lag2.laguerrersi.Last(4) + " " + lag2.laguerrersi.Last(3) + " " + lag2.laguerrersi.Last(2) + " " + lag2.laguerrersi.Last(1) + " " + lag2.laguerrersi.LastValue);
-                    //}
-            //    }
-            //}
-
-
-            if (ao.Result.IsRising())
-            {
-                dirInd = FallingRising.Rising;
-            }
-            else if (ao.Result.IsFalling())
-            {
-                dirInd = FallingRising.Falling;
-            }
-            else
-            {
-                dirInd = FallingRising.None;
-            }
-
-            //Print("previous 3th value " + ao.Result.Last(3));
-            //Print("previous 2nd value " + ao.Result.Last(2));
-            //Print("previous value " + ao.Result.Last(1));
-            //Print("current value " + ao.Result.LastValue);
-            //if (ao.Result.IsFalling())
-            //{
-            //    Print("Trend falling");
-            //}
-            //else if (ao.Result.IsRising())
-            //{
-            //    Print("Trend rising");
-            //}
-            //else
-            //{
-            //    Print("Unknown direction");
-            //}
-            //Print(ao.Result);
-
-
-            //Print("Jaws value " + all.Jaws.LastValue);
-            //Print("Teeth value " + all.Teeth.LastValue);
-            //Print("Lips value " + all.Lips.LastValue);
-
-            //Print("Tick # " + count);
-            //count = count + 1;
-            //Print("Is DownTrend " + double.IsNaN(ind.DownTrend.LastValue));
-            //Print("Elliot Downtrend Last Value " + Math.Round(ind.DownTrend.LastValue, 8));
-            //Print("Is UpTrend " + double.IsNaN(ind.UpTrend.LastValue));
-            //Print("Elliot Uptrend Last Value " + Math.Round(ind.UpTrend.LastValue, 8));
-            //Print("Is Neutral " + double.IsNaN(ind.Neutral.LastValue));
-            //Print("Elliot Neutral Last Value " + Math.Round(ind.Neutral.LastValue, 8));
-            //if (double.IsNaN(ind.DownTrend.LastValue) && double.IsNaN(ind.UpTrend.LastValue))
-            //{
-            //    Print("Trend is neutral");
-
-            //}
-            //else
-            //{
-            //    if (double.IsNaN(ind.DownTrend.LastValue) && double.IsNaN(ind.Neutral.LastValue))
-            //    {
-            //        Print("Trend is Upgoing");
+            //        cci_filter_flag = "";
             //    }
             //    else
             //    {
-            //        Print("Trnd is downgoing");
+            //        Print(crossing_cci13_msg);
+            //        Print("CCI 13 values = " + cci13_lastvalues);
+            //        crossing_cci13_msg = "";
             //    }
             //}
+            //cci_filter_flag = "";
 
-            //deviation = Math.Abs(all.Jaws.LastValue - all.Lips.LastValue);
-            //Print("Jaws/Lips deviation is " + Math.Round((double)deviation, 8));
+            #endregion
+
+
+
 
         }
+        protected override void OnTick()
+        {
+            base.OnTick();
 
+            //checking if ema crosses sma from above or from below
+
+            if (CrossedBelow(ema.Result, sma.Result))
+            {
+                crossing_msg = "ema crossed sma from below";
+                //ema_lastvalues = ema.Result.LastValue + " " + ema.Result.Last(1) + " " + ema.Result.Last(2) + " " + ema.Result.Last(3);
+                //sma_lastvalues = sma.Result.LastValue + " " + sma.Result.Last(1) + " " + sma.Result.Last(2) + " " + sma.Result.Last(3);
+                crossing_index = CrossingEnum.EmaHasCrossedSmaFromBelow;
+            }
+            if (CrossedAbove(ema.Result, sma.Result))
+            {
+                crossing_msg = "ema crossed sma from above";
+                crossing_index = CrossingEnum.EmaHasCrossedSmaFromAbove;
+            }
+
+            //checking for CCI 13 to be above 100 or below -100
+
+            //if (cci_13.Result.LastValue > 100 && cci13_is_above_100 == false)
+            //{
+            //    //Print("CCI gets above 100");
+            //    cci13_is_above_100 = true;
+            //}
+            //if (cci_13.Result.LastValue < 100 && cci13_is_above_100 == true)
+            //{
+            //    //Print("CCI left region above 100");
+            //    cci13_is_above_100 = false;
+            //}
+            //if (cci_13.Result.LastValue < -100 && cci13_is_below_minus100 == false)
+            //{
+            //    //Print("CCI gets below minus 100");
+            //    cci13_is_below_minus100 = true;
+            //}
+            //if (cci_13.Result.LastValue > -100 && cci13_is_below_minus100 == true)
+            //{
+            //    //Print("CCI left region below minus 100");
+            //    cci13_is_below_minus100 = false;
+            //}
+
+            //checking whether CCI 3 has hit from -100 to 100 and vice versa
+            cci3_values.Insert(0, cci_3.Result.LastValue);
+            cci3_values.RemoveAt(cci3_values.Count - 1);
+            //foreach (double value in cci3_values)
+            //{
+            //    Print(value + " #" + cci3_values.IndexOf(value));
+            //}
+
+            if ((cci3_values[0] > 100 && cci3_values[1] < -100) || (cci3_values[0] > 100 && cci3_values[2] < -100))
+            {
+                Print("CCI 3 hit up from -100 to 100");
+            }
+            else if ((cci3_values[0] < -100 && cci3_values[1] > 100) || (cci3_values[0] < -100 && cci3_values[2] > 100))
+            {
+                Print("CCI 3 hit down from 100 to -100");
+            }
+
+
+
+        }
         protected override void OnStop()
         {
             // Put your deinitialization logic here
         }
+        #region CrossedBelow
+        private bool CrossedBelow(DataSeries crossing, DataSeries crossed)
+        {
+            bool result = false;
+            if (Functions.HasCrossedAbove(crossing, crossed, 0))
+            {
+                result = true;
+                filter_flag = "something has recently crossed something";
+            }
+
+            return result;
+        }
+        //private bool CrossedBelow(DataSeries crossing, double value)
+        //{
+        //    bool result = false;
+        //    if (crossing.Last(0) > value && crossing.Last(1) < value)
+        //    {
+        //        result = true;
+        //        cci_filter_flag = "something has recently crossed something";
+        //    }
+
+        //    return result;
+        //}
+        #endregion
+        #region CrossedAbove
+        private bool CrossedAbove(DataSeries crossing, DataSeries crossed)
+        {
+            bool result = false;
+            if (Functions.HasCrossedBelow(crossing, crossed, 0))
+            {
+                result = true;
+                filter_flag = "something has recently crossed something";
+            }
+
+            return result;
+        }
+        //private bool CrossedAbove(DataSeries crossing, double value)
+        //{
+        //    bool result = false;
+        //    if (crossing.Last(0) < value && crossing.Last(1) > value)
+        //    {
+        //        result = true;
+        //        cci_filter_flag = "something has recently crossed something";
+        //    }
+
+        //    return result;
+        //}
+        #endregion
+        #region DecreasingIncreasing
         private bool IsDecreasing(AwesomeOscillator indicator, int iterationNumber)
         {
             bool result = false;
@@ -253,6 +326,7 @@ namespace cAlgo
             return result;
 
         }
+        #endregion
         private void initDictionary()
         {
             dict.Add(TimeFrame.Daily, 1440);
