@@ -85,8 +85,10 @@ namespace cAlgo
         public DataSeries Source { get; set; }
         [Parameter("Position volume", DefaultValue = 100000)]
         public int PositionVolume { get; set; }
-        [Parameter("Stop Order Magnitude", DefaultValue = 5)]
-        public int StopOrderMagnitude { get; set; }
+        [Parameter("Initial Stop Order Magnitude", DefaultValue = 5)]
+        public int InitialStopOrderMagnitude { get; set; }
+        [Parameter("Trailing Stop", DefaultValue = 10)]
+        public int TrailingStopValue { get; set; }
         [Parameter("Large CCI Index", DefaultValue = 13)]
         public int LargeCCIIndex { get; set; }
         [Parameter("Small CCI Index", DefaultValue = 3)]
@@ -200,10 +202,10 @@ namespace cAlgo
                     if (PositionHasList(position))
                     {
                         ListHandler(positions_values[position.Label], position.GrossProfit);
-                        Print("Latest position " + position.Label + " profit distance vs stop loss magnitude " + ((position.EntryPrice - Symbol.Bid) / Symbol.PipSize) + " " + ((position.EntryPrice - position.StopLoss) / Symbol.PipSize));
-                        Print("Last position " + position.Label + " profits " + positions_values[position.Label][0] + " " + positions_values[position.Label][1] + " " + positions_values[position.Label][2]);
-                        Print("Position entry price " + position.EntryPrice + " and stop loss " + position.StopLoss + " current price Bid " + Symbol.Bid + " and Ask " + Symbol.Ask);
-                        if (Math.Abs((Symbol.Bid - position.EntryPrice) / Symbol.PipSize) >= StopOrderMagnitude)
+                        //Print("Latest position " + position.Label + " profit distance vs stop loss magnitude " + ((position.EntryPrice - Symbol.Bid) / Symbol.PipSize) + " " + ((position.EntryPrice - position.StopLoss) / Symbol.PipSize));
+                        //Print("Last position " + position.Label + " profits " + positions_values[position.Label][0] + " " + positions_values[position.Label][1] + " " + positions_values[position.Label][2]);
+                        //Print("Position entry price " + position.EntryPrice + " and stop loss " + position.StopLoss + " current price Bid " + Symbol.Bid + " and Ask " + Symbol.Ask);
+                        if (position.GrossProfit > 0)
                         {
                             TrailingStop(position);
                         }
@@ -270,12 +272,37 @@ namespace cAlgo
             positions_values.Remove(args.Position.Label);
             Print("Current lists count = " + positions_values.Count);
         }
-        private void TrailingStop(Position pos)
+        private void TrailingStop(Position position)
         {
-            Print("Position entered Trailing Stop with profit " + pos.GrossProfit);
-            if (positions_values[pos.Label][0] > positions_values[pos.Label][1])
+            Print("Position entered Trailing Stop with profit " + position.GrossProfit);
+            if (position.TradeType == TradeType.Sell)
             {
-                SetStopLoss(pos);
+                double profit1 = position.GrossProfit + position.Commissions - TrailingStopValue * 10 * position.Volume / 100000.0;
+
+                if (profit1 > 0.0 && position.TradeType == TradeType.Sell)
+                {
+                    double stopLossPrice = Symbol.Bid + TrailingStopValue * Symbol.PipSize;
+                    if (TrailingStopValue != 0 && stopLossPrice < position.StopLoss && stopLossPrice < position.EntryPrice)
+                    {
+                        if (stopLossPrice - Symbol.Bid > 0)
+                        {
+                            ModifyPosition(position, stopLossPrice, position.TakeProfit);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                double profit2 = position.GrossProfit + position.Commissions - TrailingStopValue * 10 * position.Volume / 100000.0;
+
+                if (profit2 > 0.0 && position.TradeType == TradeType.Buy)
+                {
+                    double? stopLossPrice = Symbol.Ask - TrailingStopValue * Symbol.PipSize;
+
+                    if (TrailingStopValue != 0 && stopLossPrice > position.StopLoss && stopLossPrice > position.EntryPrice)
+                        if (stopLossPrice - Symbol.Ask < 0)
+                            ModifyPosition(position, stopLossPrice, position.TakeProfit);
+                }
             }
         }
         private bool PositionHasList(Position pos)
@@ -364,11 +391,13 @@ namespace cAlgo
         }
         private void OpenPosition(TradeType trade)
         {
-            if (cci13_index == CCI13States.LeftPlus100 && emasma_crossing_index == EmaSmaCrossingEnum.EmaHasCrossedSmaFromAbove && trade == TradeType.Sell && laguerre.laguerrersi.LastValue < 0.5 - Deviation)
+            // && laguerre.laguerrersi.LastValue < 0.5 - Deviation)
+            if (cci13_index == CCI13States.LeftPlus100 && emasma_crossing_index == EmaSmaCrossingEnum.EmaHasCrossedSmaFromAbove && trade == TradeType.Sell)
             {
                 ExecuteMarketOrder(TradeType.Sell, this.Symbol, PositionVolume, "" + position_counter);
             }
-            if (cci13_index == CCI13States.LeftMinus100 && emasma_crossing_index == EmaSmaCrossingEnum.EmaHasCrossedSmaFromBelow && trade == TradeType.Buy && laguerre.laguerrersi.LastValue > 0.5 + Deviation)
+            // && laguerre.laguerrersi.LastValue > 0.5 + Deviation)
+            if (cci13_index == CCI13States.LeftMinus100 && emasma_crossing_index == EmaSmaCrossingEnum.EmaHasCrossedSmaFromBelow && trade == TradeType.Buy)
             {
 
                 ExecuteMarketOrder(TradeType.Buy, this.Symbol, PositionVolume, "" + position_counter);
@@ -388,12 +417,12 @@ namespace cAlgo
             double takeprofit;
             if (position.TradeType == TradeType.Buy)
             {
-                takeprofit = Symbol.Ask + StopOrderMagnitude * Symbol.PipSize;
+                takeprofit = Symbol.Ask + InitialStopOrderMagnitude * Symbol.PipSize;
                 ModifyPosition(position, position.StopLoss, takeprofit);
             }
             else
             {
-                takeprofit = Symbol.Bid - StopOrderMagnitude * Symbol.PipSize;
+                takeprofit = Symbol.Bid - InitialStopOrderMagnitude * Symbol.PipSize;
                 ModifyPosition(position, position.StopLoss, takeprofit);
             }
 
@@ -403,12 +432,12 @@ namespace cAlgo
             double stoploss;
             if (position.TradeType == TradeType.Buy)
             {
-                stoploss = Symbol.Bid - StopOrderMagnitude * Symbol.PipSize;
+                stoploss = Symbol.Bid - InitialStopOrderMagnitude * Symbol.PipSize;
                 ModifyPosition(position, stoploss, position.TakeProfit);
             }
             else
             {
-                stoploss = Symbol.Ask + StopOrderMagnitude * Symbol.PipSize;
+                stoploss = Symbol.Ask + InitialStopOrderMagnitude * Symbol.PipSize;
                 ModifyPosition(position, stoploss, position.TakeProfit);
             }
 
